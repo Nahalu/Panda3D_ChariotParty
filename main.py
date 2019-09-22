@@ -21,6 +21,8 @@ board_pos = []
 board_case_value = []
 number_turn = ""
 sizeboard_entry = ""
+board_getpos = []
+players = []
 
 
 class Game(ShowBase):
@@ -211,19 +213,26 @@ class Game(ShowBase):
         self.player.setScale(0.5)
         self.player.setColor(WHITE)
         self.player.setPos(2, 2, 2)
+        coordPlayer = {
+            "x": int(self.player.getPos().x),
+            "y": int(self.square.getPos().y),
+            "z": int(self.square.getPos().z)
+        }
+        players.append(
+            {"id": 1, "position": coordPlayer, "carbon": 0, "gold": 0})
         self.player.reparentTo(self.render)
         rangeBoard = 20
         rangeBoard = int(rangeBoard/4)
         for i in range(1, rangeBoard-1):
-            self.square = loader.loadModel(
+            square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
             square.setColor(BLACK)
             square.setPos(2 + (i*2), 2, 1)
             coord = {
-                int(square.getPos().x),
-                int(square.getPos().y),
-                int(square.getPos().z)
+                "x": int(square.getPos().x),
+                "y": int(square.getPos().y),
+                "z": int(square.getPos().z)
             }
             board_pos.append(coord)
             square.reparentTo(self.render)
@@ -234,9 +243,9 @@ class Game(ShowBase):
             square.setColor(BLACK)
             square.setPos(8, 2 + (i*2), 1)
             coord = {
-                int(square.getPos().x),
-                int(square.getPos().y),
-                int(square.getPos().z)
+                "x": int(square.getPos().x),
+                "y": int(square.getPos().y),
+                "z": int(square.getPos().z)
             }
             board_pos.append(coord)
             square.reparentTo(self.render)
@@ -247,9 +256,9 @@ class Game(ShowBase):
             square.setColor(BLACK)
             square.setPos(8 - (i*2), 8, 1)
             coord = {
-                int(square.getPos().x),
-                int(square.getPos().y),
-                int(square.getPos().z)
+                "x": int(square.getPos().x),
+                "y": int(square.getPos().y),
+                "z": int(square.getPos().z)
             }
             board_pos.append(coord)
             square.reparentTo(self.render)
@@ -260,9 +269,9 @@ class Game(ShowBase):
             square.setColor(BLACK)
             square.setPos(2, 8 - (i*2), 1)
             coord = {
-                int(square.getPos().x),
-                int(square.getPos().y),
-                int(square.getPos().z)
+                "x": int(square.getPos().x),
+                "y": int(square.getPos().y),
+                "z": int(square.getPos().z)
             }
             board_pos.append(coord)
             square.reparentTo(self.render)
@@ -293,11 +302,11 @@ class Game(ShowBase):
         # If any movement keys are pressed, use the above time
         # to calculate how far to move the character, and apply that.
         if self.keyMap["up"]:
-            print("sucess")
-            self.player.setPos(self.player.getPos() + Vec3(0, 5.0*dt, 0))
+            random_move = randint(1, 6)
+            board_dice = board_pos[random_move]
+            self.player.setPos(board_dice["x"],
+                               board_dice["y"], 2)
         return Task.cont
-    # def movePlayer():
-    #     player.setPos(-5 * 2/4, 2, -1)
 
     # A handy little function for getting the proper position for a given square
 

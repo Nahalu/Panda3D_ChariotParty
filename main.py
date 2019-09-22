@@ -17,6 +17,7 @@ number_player = 0
 gold_position = 24
 list_player = []
 board = []
+board_pos = []
 board_case_value = []
 number_turn = ""
 sizeboard_entry = ""
@@ -29,6 +30,10 @@ class Game(ShowBase):
         ShowBase.__init__(self)
         global number_player
         global sizeboard_entry
+        self.keyMap = {
+            "up": False,
+        }
+
         properties = WindowProperties()
         properties.setSize(1000, 750)
         self.win.requestProperties(properties)
@@ -54,15 +59,8 @@ class Game(ShowBase):
                                        fadeScreen=0.4,
                                        relief=DGG.FLAT,
                                        frameTexture="UI/background.jpg")
-        # self.gameBoard = DirectDialog(frameSize=(-1, 1, -1, 1),
-        #                               fadeScreen=0.4,
-        #                               relief=DGG.FLAT,
-        #                               frameTexture="UI/background.jpg")
 
         buttonImages = (
-            loader.loadTexture("UI/button.png"),
-            loader.loadTexture("UI/button.png"),
-            loader.loadTexture("UI/button.png"),
             loader.loadTexture("UI/button.png")
         )
 
@@ -208,20 +206,26 @@ class Game(ShowBase):
         square = loader.loadModel(
             "Models/cube.egg")
 
-        player = loader.loadModel(
+        self.player = loader.loadModel(
             "Models/cube.egg")
-        player.setScale(0.5)
-        player.setColor(WHITE)
-        player.setPos(2, 2, 2)
-        player.reparentTo(self.render)
+        self.player.setScale(0.5)
+        self.player.setColor(WHITE)
+        self.player.setPos(2, 2, 2)
+        self.player.reparentTo(self.render)
         rangeBoard = 20
         rangeBoard = int(rangeBoard/4)
         for i in range(1, rangeBoard-1):
-            square = loader.loadModel(
+            self.square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
             square.setColor(BLACK)
             square.setPos(2 + (i*2), 2, 1)
+            coord = {
+                int(square.getPos().x),
+                int(square.getPos().y),
+                int(square.getPos().z)
+            }
+            board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(1, rangeBoard-1):
             square = loader.loadModel(
@@ -229,7 +233,12 @@ class Game(ShowBase):
             square.setScale(0.5)
             square.setColor(BLACK)
             square.setPos(8, 2 + (i*2), 1)
-            print(square.getPos())
+            coord = {
+                int(square.getPos().x),
+                int(square.getPos().y),
+                int(square.getPos().z)
+            }
+            board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(1, rangeBoard-1):
             square = loader.loadModel(
@@ -237,6 +246,12 @@ class Game(ShowBase):
             square.setScale(0.5)
             square.setColor(BLACK)
             square.setPos(8 - (i*2), 8, 1)
+            coord = {
+                int(square.getPos().x),
+                int(square.getPos().y),
+                int(square.getPos().z)
+            }
+            board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(rangeBoard-1):
             square = loader.loadModel(
@@ -244,7 +259,14 @@ class Game(ShowBase):
             square.setScale(0.5)
             square.setColor(BLACK)
             square.setPos(2, 8 - (i*2), 1)
+            coord = {
+                int(square.getPos().x),
+                int(square.getPos().y),
+                int(square.getPos().z)
+            }
+            board_pos.append(coord)
             square.reparentTo(self.render)
+        print(board_pos)
 
         # tex = loader.loadTexture('Models/dice_1.rgb')
         # square.setTexture(tex, 1)
@@ -257,8 +279,25 @@ class Game(ShowBase):
         # music.setVolume(0.075)
         music.play()
 
-    def movePlayer():
-        player.setPos(-5 * 2/4, 2, -1)
+        self.accept("w", self.updateKeyMap, ["up", True])
+        self.accept("w-up", self.updateKeyMap, ["up", False])
+
+        updateTask = taskMgr.add(self.update, "update")
+
+    def updateKeyMap(self, controlName, controlState):
+        self.keyMap[controlName] = controlState
+
+    def update(self, task):
+        # Get the amount of time since the last update
+        dt = globalClock.getDt()
+        # If any movement keys are pressed, use the above time
+        # to calculate how far to move the character, and apply that.
+        if self.keyMap["up"]:
+            print("sucess")
+            self.player.setPos(self.player.getPos() + Vec3(0, 5.0*dt, 0))
+        return Task.cont
+    # def movePlayer():
+    #     player.setPos(-5 * 2/4, 2, -1)
 
     # A handy little function for getting the proper position for a given square
 

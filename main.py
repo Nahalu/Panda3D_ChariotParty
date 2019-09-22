@@ -204,42 +204,74 @@ class Game(ShowBase):
                                         initialText="", numLines=1, focusInCommand=clearTextTurn, parent=self.optionMenu)
 
         self.optionMenu.hide()
-        self.scene = self.loader.loadModel("models/environment")
-        # self.gameBoard.hide()
         music = loader.loadMusic("Sounds/Musics/ambiance.ogg")
         square = loader.loadModel(
             "Models/cube.egg")
 
-        for i in range(20):
+        player = loader.loadModel(
+            "Models/cube.egg")
+        player.setScale(0.5)
+        player.setColor(WHITE)
+        player.setPos(2, 2, 2)
+        player.reparentTo(self.render)
+        rangeBoard = 20
+        rangeBoard = int(rangeBoard/4)
+        for i in range(1, rangeBoard-1):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
             square.setColor(BLACK)
-            square.setPos(-5 * i/3, 1, -1)
+            square.setPos(2 + (i*2), 2, 1)
+            square.reparentTo(self.render)
+        for i in range(1, rangeBoard-1):
+            square = loader.loadModel(
+                "Models/cube.egg")
+            square.setScale(0.5)
+            square.setColor(BLACK)
+            square.setPos(8, 2 + (i*2), 1)
+            print(square.getPos())
+            square.reparentTo(self.render)
+        for i in range(1, rangeBoard-1):
+            square = loader.loadModel(
+                "Models/cube.egg")
+            square.setScale(0.5)
+            square.setColor(BLACK)
+            square.setPos(8 - (i*2), 8, 1)
+            square.reparentTo(self.render)
+        for i in range(rangeBoard-1):
+            square = loader.loadModel(
+                "Models/cube.egg")
+            square.setScale(0.5)
+            square.setColor(BLACK)
+            square.setPos(2, 8 - (i*2), 1)
             square.reparentTo(self.render)
 
         # tex = loader.loadTexture('Models/dice_1.rgb')
         # square.setTexture(tex, 1)
 
-        self.camera.setPos(0, -20, 0)
-        self.camera.setHpr(10, 10, 0)
-        # self.camera.reparentTo(self.gameBoard)
+        # setPos(x,y,z) start x:right y:forward z:up
+        self.camera.setPos(4, -25, 20)
+        self.camera.setHpr(0, -30, 0)
 
         music.setLoop(True)
         # music.setVolume(0.075)
         music.play()
 
-    # A handy little function for getting the proper position for a given square
-    def SquarePos(i):
-        return Point3((i % 8) - 3.5, int(i/8) - 3.5, 0)
+    def movePlayer():
+        player.setPos(-5 * 2/4, 2, -1)
 
-    # Helper function for determining wheter a square should be white or black
-    # The modulo operations (%) generate the every-other pattern of a chess-board
-    def SquareColor(i):
-        if (i + ((i/8) % 2)) % 2:
-            return BLACK
-        else:
-            return WHITE
+    # A handy little function for getting the proper position for a given square
+
+    # def SquarePos(i):
+    #     return Point3((i % 8) - 3.5, int(i/8) - 3.5, 0)
+
+    # # Helper function for determining wheter a square should be white or black
+    # # The modulo operations (%) generate the every-other pattern of a chess-board
+    # def SquareColor(i):
+    #     if (i + ((i/8) % 2)) % 2:
+    #         return BLACK
+    #     else:
+    #         return WHITE
 
     def startGame(self):
         self.titleMenu.hide()

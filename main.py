@@ -19,12 +19,15 @@ board_pos = []
 board_pos_value = []
 board_dice = 0
 sizeboard_entry = ""
+turn_text_entry = ""
 players = []
 gold_position = ""
 players_object = []
 scoreboards = []
 list_square_color = []
-
+turn_text_object = []
+i = 0
+turn = 1
 
 class Game(ShowBase):
 
@@ -33,7 +36,8 @@ class Game(ShowBase):
         ShowBase.__init__(self)
         global number_player
         global sizeboard_entry
-        global coordPlayer
+        global turn_text_entry
+
         self.keyMap = {
             "up": False,
         }
@@ -212,18 +216,32 @@ class Game(ShowBase):
         self.keyMap[controlName] = controlState
 
     def update(self, task):
-        global board_dice
+        global i
+        global turn
+        global turn_text_entry
         # Get the amount of time since the last update
         dt = globalClock.getDt()
         # If any movement keys are pressed, use the above time
         # to calculate how far to move the character, and apply that.
 
         if self.keyMap["up"]:
-            for i in range(0, number_player):
-                self.movePlayer(players[i], players_object[i])
-                self.applyEffect(players[i])
-                self.updateScoreBoard(players[i], scoreboards[i])
+            if (turn == int(turn_text_entry.get())):
+                self.optionMenu.show()
+            else:
+                if(i < number_player):
+                    self.movePlayer(players[i], players_object[i])
+                    self.applyEffect(players[i])
+                    self.updateScoreBoard(players[i], scoreboards[i])
+                    self.updateTurn(turn_text_object[0], turn)
+                    i += 1
+                elif i == number_player:
+                    turn += 1
+                    i = 0
         return Task.cont
+
+    def playerTurn(player):
+        i = 1
+
 
     def movePlayer(self, player, player_object):
         random_move = randint(1, 6)
@@ -254,18 +272,24 @@ class Game(ShowBase):
         self.createPlayer()
         self.createScoreBoard()
         self.placeGold()
+        self.createTurn()
 
 
     def createScoreBoard(self):
         for i in range(len(players)):
-            player_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']}  Turn : {players[i]['turn']}", pos=(4, 14 - (i+2)), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.render)
+            player_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']} ", pos=(4, 14 - (i+2)), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.render)
             scoreboards.append(player_scoreboard)
     
     def updateScoreBoard(self, player ,scoreboard):
-        scoreboard.setText(f"Player {player['id']}   Charbon: {player['carbon']} Gold: {player['gold']}  Turn : {player['turn']}")
+        scoreboard.setText(f"Player {player['id']}   Charbon: {player['carbon']} Gold: {player['gold']} ")
 
-    # def updatePlayer(player, case_value):
-    #     if case_value.getPos
+
+    def createTurn(self):
+        turn_text = OnscreenText(text=f"Turn - 1", pos=(4, -4), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.render)
+        turn_text_object.append(turn_text)
+    
+    def updateTurn(self,turn_text, turn):
+        turn_text.setText(f"Turn - {turn}")
 
     def placeGold(self):
         random_pos = board_pos[randint(1, len(board_pos))]
@@ -290,7 +314,7 @@ class Game(ShowBase):
                 "z": int(player.getPos().z - 1)
             }
             players.append(
-                {"id": i, "position": coordPlayer, "carbon": 5, "gold": 0, "turn": 0})
+                {"id": i, "position": coordPlayer, "carbon": 5, "gold": 0})
             players_object.append(player)
             player.reparentTo(self.render)
 
@@ -342,7 +366,7 @@ class Game(ShowBase):
             board_pos_value.append(square)
             board_pos.append(coord)
             square.reparentTo(self.render)
-        for i in range(rangeBoard-1):
+        for i in range(1, rangeBoard-1):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
@@ -362,9 +386,12 @@ class Game(ShowBase):
         
         result = list_square_color[index_board_player]
         if result == 1:
-            player["carbon"]=3
+            player["carbon"] += 3
         elif result == 2:
-            player["carbon"]=0
+            if player["carbon"] <= 3:
+                player["carbon"] = 3
+            else:
+                player["carbon"] -= 3
 
     def effectSquare(self):
         for i in range(len(board_pos_value)):
@@ -398,28 +425,6 @@ game.run()
 
 
 
-# while (player["turn"] <= number_turn):
-
-# A handy little function for getting the proper position for a given square
-
-# def SquarePos(i):
-#     return Point3((i % 8) - 3.5, int(i/8) - 3.5, 0)
-
-# # Helper function for determining wheter a square should be white or black
-# # The modulo operations (%) generate the every-other pattern of a chess-board
-# def SquareColor(i):
-#     if (i + ((i/8) % 2)) % 2:
-#         return BLACK
-#     else:
-#         return WHITE
-
-# def build_dict(seq, key):
-#     return dict((d[key], dict(d, index=index)) for (index, d) in enumerate(seq))
-
-# info_by_name = build_dict(lst, key="name")
-# tom_info = info_by_name.get("Tom")
-
-
 
         # def spinCameraTask(self, task):
         #     angleDegrees = task.time * 6.0
@@ -430,23 +435,3 @@ game.run()
         #     return Task.cont
 
         # self.taskMgr.add(spinCameraTask, "SpinCameraTask")
-
-
-    # def color():
-    #     random_color = randint(1, 3)
-    #     if random_color == 1:
-    #         color = Vec4(1, 1, 1, 1)
-    #     elif random_color == 2:
-    #         color = Vec4(50, 205, 50, 1)
-    #     elif random_color == 3:
-    #         color = Vec4(178, 34, 34, 1)
-    #     return color
-
-        # self.squareRoot = render.attachNewNode("squareRoot")
-        # for i in range(int(sizeboard_entry.getNumCharacters())):
-        #     # Load, parent, color, and position the model (a single square polygon)
-        #     self.squares[i] = loader.loadModel(
-        #         "Models/cube.egg")
-        # self.squares[i].reparentTo(self.squareRoot)
-        # self.squares[i].setPos(SquarePos(i))
-        # self.squares[i].setColor(SquareColor(i))

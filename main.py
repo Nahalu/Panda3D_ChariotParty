@@ -15,13 +15,16 @@ RED = Vec4(1, 0, 0, 1)
 
 number_player = 1
 number_turn = ""
-board = []
 board_pos = []
+board_pos_value = []
 board_dice = 0
 sizeboard_entry = ""
 players = []
 gold_position = ""
 players_object = []
+scoreboards = []
+list_square_color = []
+
 
 class Game(ShowBase):
 
@@ -214,9 +217,12 @@ class Game(ShowBase):
         dt = globalClock.getDt()
         # If any movement keys are pressed, use the above time
         # to calculate how far to move the character, and apply that.
+
         if self.keyMap["up"]:
             for i in range(0, number_player):
                 self.movePlayer(players[i], players_object[i])
+                self.applyEffect(players[i])
+                self.updateScoreBoard(players[i], scoreboards[i])
         return Task.cont
 
     def movePlayer(self, player, player_object):
@@ -244,14 +250,23 @@ class Game(ShowBase):
     def startGame(self):
         self.optionMenu.hide()
         self.createBoard()
+        self.effectSquare()
         self.createPlayer()
+        self.createScoreBoard()
         self.placeGold()
 
-    
-    def updateScoreBoard():
-        print("test")
 
-        
+    def createScoreBoard(self):
+        for i in range(len(players)):
+            player_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']}  Turn : {players[i]['turn']}", pos=(4, 14 - (i+2)), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.render)
+            scoreboards.append(player_scoreboard)
+    
+    def updateScoreBoard(self, player ,scoreboard):
+        scoreboard.setText(f"Player {player['id']}   Charbon: {player['carbon']} Gold: {player['gold']}  Turn : {player['turn']}")
+
+    # def updatePlayer(player, case_value):
+    #     if case_value.getPos
+
     def placeGold(self):
         random_pos = board_pos[randint(1, len(board_pos))]
         gold = loader.loadModel(
@@ -275,7 +290,7 @@ class Game(ShowBase):
                 "z": int(player.getPos().z - 1)
             }
             players.append(
-                {"id": i, "position": coordPlayer, "carbon": 0, "gold": 0})
+                {"id": i, "position": coordPlayer, "carbon": 5, "gold": 0, "turn": 0})
             players_object.append(player)
             player.reparentTo(self.render)
 
@@ -284,7 +299,6 @@ class Game(ShowBase):
         self.optionMenu.hide()
         self.titleMenu.hide()
 
-        board = [0 for x in range(int(sizeboard_entry.get()))]
         random_position = randint(1, int(sizeboard_entry.get()))
 
         rangeBoard = int(int(sizeboard_entry.get())/4)
@@ -292,7 +306,6 @@ class Game(ShowBase):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
-            square.setColor(GREEN)
             square.setPos(2 + (i*2), 2, 1)
 
             coord = {
@@ -300,47 +313,74 @@ class Game(ShowBase):
                 "y": int(square.getPos().y),
                 "z": int(square.getPos().z)
             }
+            board_pos_value.append(square)
             board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(1, rangeBoard-1):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
-            square.setColor(RED)
             square.setPos(8, 2 + (i*2), 1)
             coord = {
                 "x": int(square.getPos().x),
                 "y": int(square.getPos().y),
                 "z": int(square.getPos().z)
             }
+            board_pos_value.append(square)
             board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(1, rangeBoard-1):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
-            square.setColor(WHITE)
             square.setPos(8 - (i*2), 8, 1)
             coord = {
                 "x": int(square.getPos().x),
                 "y": int(square.getPos().y),
                 "z": int(square.getPos().z)
             }
+            board_pos_value.append(square)
             board_pos.append(coord)
             square.reparentTo(self.render)
         for i in range(rangeBoard-1):
             square = loader.loadModel(
                 "Models/cube.egg")
             square.setScale(0.5)
-            square.setColor(BLACK)
             square.setPos(2, 8 - (i*2), 1)
             coord = {
                 "x": int(square.getPos().x),
                 "y": int(square.getPos().y),
                 "z": int(square.getPos().z)
             }
+            board_pos_value.append(square)
             board_pos.append(coord)
             square.reparentTo(self.render)
+
+    def applyEffect(self, player):
+        index_board_player = next((index for (index, d) in enumerate(
+            board_pos) if d["x"] == player["position"]["x"] and d["y"] == player["position"]["y"]), None)
+        
+        result = list_square_color[index_board_player]
+        if result == 1:
+            player["carbon"]=3
+        elif result == 2:
+            player["carbon"]=0
+
+    def effectSquare(self):
+        for i in range(len(board_pos_value)):
+            random_color = randint(1,3)
+            if random_color == 1:
+                board_pos_value[i].setColor(GREEN)
+            elif random_color == 2:
+                board_pos_value[i].setColor(RED)
+            elif random_color == 3:
+                board_pos_value[i].setColor(BLACK)
+            list_square_color.append(random_color)
+            # prob = [25,20,5,50]
+            # random_color = random.choice(board, prob)
+            # for i in range():
+            #     board_pos_value.setColor(BLACK)
+            #     print(random_color)
 
     def quit(self):
         base.userExit()

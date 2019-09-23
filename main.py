@@ -280,6 +280,7 @@ class Game(ShowBase):
             "z": int(player_object.getPos().z - 1)
         }
 
+
     def buyGold(self):
         gold_position
 

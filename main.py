@@ -6,7 +6,9 @@ from panda3d.core import *
 from direct.task import Task
 from math import pi, sin, cos
 
+import time
 from random import *
+from datetime import date
 
 BLACK = Vec4(0, 0, 0, 1)
 WHITE = Vec4(1, 1, 1, 1)
@@ -19,7 +21,7 @@ board_pos = []
 board_pos_value = []
 board_dice = 0
 sizeboard_entry = ""
-turn_text_entry = ""
+number_turn_entry = ""
 players = []
 gold_position = ""
 players_object = []
@@ -36,7 +38,7 @@ class Game(ShowBase):
         ShowBase.__init__(self)
         global number_player
         global sizeboard_entry
-        global turn_text_entry
+        global number_turn_entry
 
         self.keyMap = {
             "up": False,
@@ -54,6 +56,10 @@ class Game(ShowBase):
                                       relief=DGG.FLAT,
                                       frameTexture="UI/background.jpg")
         self.optionMenu = DirectDialog(frameSize=(-1.5, 1.5, -1.5, 1.5),
+                                       fadeScreen=0.4,
+                                       relief=DGG.FLAT,
+                                       frameTexture="UI/background.jpg")
+        self.scoreboardResult = DirectDialog(frameSize=(-1.5, 1.5, -1.5, 1.5),
                                        fadeScreen=0.4,
                                        relief=DGG.FLAT,
                                        frameTexture="UI/background.jpg")
@@ -157,6 +163,22 @@ class Game(ShowBase):
                            text_pos=(0, -0.2))
         btn.setTransparency(True)
 
+
+        btn = DirectButton(text="Export",
+                           command=self.exportResult,
+                           text_fg=(76, 178, 178, 1),
+                           pos=(-0.3, 0, -0.2),
+                           parent=self.scoreboardResult,
+                           scale=0.07,
+                           text_font=self.font,
+                           clickSound=loader.loadSfx("Sounds/click.ogg"),
+                           frameTexture=buttonImages,
+                           frameSize=(-4, 4, -1, 1),
+                           text_scale=0.75,
+                           relief=DGG.FLAT,
+                           text_pos=(0, -0.2))
+        btn.setTransparency(True)
+
         # add some text
 
         number_player_text = OnscreenText(text=f"Number of player : {number_player}", pos=(0, 0.50),
@@ -168,7 +190,7 @@ class Game(ShowBase):
         size_board_text = OnscreenText(text="Board size :", pos=(0, 0.10),
                          scale=0.07, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.optionMenu)
 
-        numberTurn = OnscreenText(text=number_turn, pos=(1, 0.5),
+        numberTurn = OnscreenText(text=number_turn_entry, pos=(1, 0.5),
                                   scale=0.07, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.optionMenu)
         sizeBoard = OnscreenText(text=sizeboard_entry, pos=(1, 0),
                                  scale=0.07, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.optionMenu)
@@ -206,7 +228,7 @@ class Game(ShowBase):
 
         music.setLoop(True)
         music.play()
-
+        self.scoreboardResult.hide()
         self.accept("w", self.updateKeyMap, ["up", True])
         self.accept("w-up", self.updateKeyMap, ["up", False])
 
@@ -218,15 +240,15 @@ class Game(ShowBase):
     def update(self, task):
         global i
         global turn
-        global turn_text_entry
+        global number_turn_entry
         # Get the amount of time since the last update
         dt = globalClock.getDt()
         # If any movement keys are pressed, use the above time
         # to calculate how far to move the character, and apply that.
 
         if self.keyMap["up"]:
-            if (turn == int(turn_text_entry.get())):
-                self.optionMenu.show()
+            if (turn == int(number_turn_entry.get())+1):
+                self.scoreboardResult.show()
             else:
                 if(i < number_player):
                     self.movePlayer(players[i], players_object[i])
@@ -237,11 +259,8 @@ class Game(ShowBase):
                 elif i == number_player:
                     turn += 1
                     i = 0
+            time.sleep(0.1)
         return Task.cont
-
-    def playerTurn(player):
-        i = 1
-
 
     def movePlayer(self, player, player_object):
         random_move = randint(1, 6)
@@ -261,6 +280,9 @@ class Game(ShowBase):
             "z": int(player_object.getPos().z - 1)
         }
 
+    def buyGold(self):
+        gold_position
+
     def begin(self):
         self.titleMenu.hide()
         self.optionMenu.show()
@@ -273,6 +295,14 @@ class Game(ShowBase):
         self.createScoreBoard()
         self.placeGold()
         self.createTurn()
+
+    def exportResult(self):
+
+        file1 = open(f"chariot-party-{date.today()}.txt","w") 
+        L = ["This is Delhi \n","This is Paris \n","This is London \n"]  
+
+        file1.write("Hello \n") 
+        file1.writelines(L) 
 
 
     def createScoreBoard(self):

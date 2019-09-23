@@ -247,6 +247,10 @@ class Game(ShowBase):
         self.createPlayer()
         self.placeGold()
 
+    
+    def updateScoreBoard():
+        print("test")
+
         
     def placeGold(self):
         random_pos = board_pos[randint(1, len(board_pos))]

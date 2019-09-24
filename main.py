@@ -9,7 +9,7 @@ from math import pi, sin, cos
 import time
 from random import *
 from datetime import date
-from test import *
+from Helpers.compare import *
 
 BLACK = Vec4(0, 0, 0, 1)
 WHITE = Vec4(1, 1, 1, 1)
@@ -266,7 +266,6 @@ class Game(ShowBase):
             if (turn == int(number_turn_entry.get())+1):
                 self.scoreboardResult.show()
                 self.showResult()
-                print(players)
             else:
                 if(i < number_player):
                     self.movePlayer(players[i], players_object[i])
@@ -283,8 +282,9 @@ class Game(ShowBase):
 
     def showResult(self):
         compare(players)
+        result_scoreboard = OnscreenText(text=f"Scoreboard :", pos=(0, 0.6 ), scale=0.07, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.scoreboardResult)
         for i in range(len(players)):
-            player_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']} ", pos=(0, 14 - (i+2)), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.scoreboardResult)
+            result_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']} ", pos=(0, 0.5 - (i/5) ), scale=0.07, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.scoreboardResult)
 
     def movePlayer(self, player, player_object):
         random_move = randint(1, 6)
@@ -326,11 +326,11 @@ class Game(ShowBase):
 
     def exportResult(self):
 
-        file1 = open(f"chariot-party-{date.today()}.txt","w") 
-        L = ["This is Delhi \n","This is Paris \n","This is London \n"]  
-
-        file1.write("Hello \n") 
-        file1.writelines(L) 
+        file1 = open(f"chariot-party-{date.today()}.txt","w")
+        for i in range(len(players)):
+            L = [f"Player : {players[i]['id']}, Gold : {players[i]['gold']}, Carbon : {players[i]['carbon']}  \n"]  
+    
+            file1.writelines(L)
 
 
     def createScoreBoard(self):
@@ -350,7 +350,7 @@ class Game(ShowBase):
         turn_text.setText(f"Turn - {turn}")
 
     def placeGold(self):
-        random_pos = board_pos[randint(1, len(board_pos))]
+        random_pos = board_pos[randint(0, len(board_pos))]
         gold = loader.loadModel(
             "Models/cube.egg")
         gold.setScale(0.5)

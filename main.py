@@ -9,6 +9,7 @@ from math import pi, sin, cos
 import time
 from random import *
 from datetime import date
+from test import *
 
 BLACK = Vec4(0, 0, 0, 1)
 WHITE = Vec4(1, 1, 1, 1)
@@ -62,7 +63,7 @@ class Game(ShowBase):
         self.scoreboardResult = DirectDialog(frameSize=(-1.5, 1.5, -1.5, 1.5),
                                        fadeScreen=0.4,
                                        relief=DGG.FLAT,
-                                       frameTexture="UI/background.jpg")
+                                       frameTexture="UI/end.jpg")
 
         buttonImages = (
             loader.loadTexture("UI/button.png")
@@ -167,7 +168,22 @@ class Game(ShowBase):
         btn = DirectButton(text="Export",
                            command=self.exportResult,
                            text_fg=(76, 178, 178, 1),
-                           pos=(-0.3, 0, -0.2),
+                           pos=(-0.3, 0, -0.4),
+                           parent=self.scoreboardResult,
+                           scale=0.07,
+                           text_font=self.font,
+                           clickSound=loader.loadSfx("Sounds/click.ogg"),
+                           frameTexture=buttonImages,
+                           frameSize=(-4, 4, -1, 1),
+                           text_scale=0.75,
+                           relief=DGG.FLAT,
+                           text_pos=(0, -0.2))
+        btn.setTransparency(True)
+
+        btn = DirectButton(text="Restart",
+                           command=self.restartGame,
+                           text_fg=(76, 178, 178, 1),
+                           pos=(0.3, 0, -0.4),
                            parent=self.scoreboardResult,
                            scale=0.07,
                            text_font=self.font,
@@ -249,6 +265,8 @@ class Game(ShowBase):
         if self.keyMap["up"]:
             if (turn == int(number_turn_entry.get())+1):
                 self.scoreboardResult.show()
+                self.showResult()
+                print(players)
             else:
                 if(i < number_player):
                     self.movePlayer(players[i], players_object[i])
@@ -261,6 +279,12 @@ class Game(ShowBase):
                     i = 0
             time.sleep(0.1)
         return Task.cont
+
+
+    def showResult(self):
+        compare(players)
+        for i in range(len(players)):
+            player_scoreboard = OnscreenText(text=f"Player {players[i]['id']}   Charbon: {players[i]['carbon']} Gold: {players[i]['gold']} ", pos=(0, 14 - (i+2)), scale=1, fg=(255, 250, 250, 1), align=TextNode.ACenter, mayChange=1, parent=self.scoreboardResult)
 
     def movePlayer(self, player, player_object):
         random_move = randint(1, 6)
@@ -296,6 +320,9 @@ class Game(ShowBase):
         self.createScoreBoard()
         self.placeGold()
         self.createTurn()
+
+    def restartGame(self):
+        print("restart")
 
     def exportResult(self):
 

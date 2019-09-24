@@ -28,9 +28,12 @@ python3 main.py
 
 ## Control
 
-**Keyboard** : Interact with the inputs.
-**Mouse** : Interact with the buttons.
 **w** : Move the players.
+
+When a deal appear :
+
+**a** : Accept to buy gold.
+**z** : Refuse to buy gold.
 
 ## Endgame
 
